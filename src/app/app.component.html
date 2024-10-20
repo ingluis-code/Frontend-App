@@ -1,8 +1,24 @@
-<div class="div container">
-  <h2>Formulario de Libros Favoritos</h2>
-  <form [formGroup]="bookForm" (ngSubmit)="addBook()">
-    <label for="title">Titulo del Libro:</label>
-    <input type="text" id="title" formControlName="title">
-    <button type="submit">Agregar Libro</button>
+<h2>Mis Libros Favoritos</h2>
+<form class="add-book-form" [formGroup]="bookForm" (ngSubmit)="addBook()">
+  <input type="text" placeholder="Agregar nuevo libro" formControlName="title">
+  <button type="submit">Agregar</button>
+</form>
+
+<div class="book-list-container">
+  <form class="search-book-form">
+      <input type="text" placeholder="Buscar libro" required>
+      <button type="submit">Buscar</button>
   </form>
+
+  @for (book of books; track $index){
+    <div class="book-item">
+        <span class="book-title">{{ book.title }}</span>
+        <div class="buttons">
+            <button class="edit" (click)="editBook(book)">Editar</button>
+            <button class="delete" (click)="deleteBook(book)">Eliminar</button>
+        </div>
+    </div>
+  }@empty {
+    <div class="no-items" id="no-books-message">No hay libros disponibles.</div>
+  }
 </div>

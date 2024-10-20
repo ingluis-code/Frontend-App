@@ -25,6 +25,10 @@ export class AppComponent {
       title: [''],
     });
   }
+
+  ngOnInit(){
+    this.getAllBooks();
+  }
   
   addBook(){
      const newBook = this.bookForm.getRawValue() as Book;
@@ -40,6 +44,7 @@ export class AppComponent {
               confirmButtonText: 'Aceptar',
               showConfirmButton: true
             });
+            this.getAllBooks();
          },
          error: (error) => {
             console.log(error.error.message)
@@ -66,13 +71,26 @@ export class AppComponent {
        this.books = response.data
        console.log(this.books)
      },
-     error: (err) => {
-       console.log('ERROR')
+     error: (error) => {
+      Swal.fire({
+        title: 'Error!',
+        text: error.error.message,
+        icon: 'error',
+        confirmButtonText: 'Aceptar',
+        showConfirmButton: true
+      })
+   
      }
    });
  }
 
- ngOnInit(){
-   this.getAllBooks();
+ editBook(book: Book){
+
  }
+
+ deleteBook(book: Book){
+
+ }
+
+
 }
