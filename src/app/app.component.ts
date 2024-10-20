@@ -151,7 +151,6 @@ export class AppComponent {
          showConfirmButton: true
        })
     }
-    
   });
 
  }
@@ -160,9 +159,47 @@ export class AppComponent {
 
  }
 
- deleteBook(book: Book){
+ deleteBook(id: string){
 
- }
+  Swal.fire({
+    title: '¿Estas seguro/a?',
+    text: '¡No podrás revertir esto!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Si, Borrar!',
+    cancelButtonText: 'No, cancelar!',
+    reverseButtons: true,
+  }).then((result) => {
+
+    if (result.isConfirmed) {
+      this.bookService.deleteBook(id).subscribe({
+        next: (response) => {
+           console.log(response);
+           Swal.fire({
+            title: 'Exito',
+            text: response.message,
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+            showConfirmButton: true
+          });
+          this.getAllBooks();
+        },
+        error: (error) => {
+           console.log(error.error.message)
+           Swal.fire({
+             title: 'Error!',
+             text: error.error.message,
+             icon: 'error',
+             confirmButtonText: 'Aceptar',
+             showConfirmButton: true
+           })
+        }
+      });
+    }
+  });
+
+
+}
 
 
 }

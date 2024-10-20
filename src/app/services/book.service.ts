@@ -26,7 +26,7 @@ export class BookService {
   }
 
   deleteBook(id: string){
-
+    return this.http.delete<Book>(`${this.base_url}/books/${ id }`);
   }
 
   findByIdOrTitle(id: string){
