@@ -19,6 +19,8 @@ export class AppComponent {
   private readonly fb = inject(FormBuilder);
   books: any = [];
   bookForm: FormGroup;
+  edit = false;
+  idBook: string = "";
 
   constructor() {
     this.bookForm = this.fb.group({
@@ -28,6 +30,15 @@ export class AppComponent {
 
   ngOnInit(){
     this.getAllBooks();
+  }
+
+  addOrEditBook(){
+    if(!this.edit){
+        this.addBook();
+    }else{
+      this.editBook();
+    }
+
   }
   
   addBook(){
@@ -84,7 +95,68 @@ export class AppComponent {
    });
  }
 
- editBook(book: Book){
+ editBook(){
+
+   if(this.bookForm.valid){
+
+    const updateBook = this.bookForm.getRawValue() as Book;
+
+    this.bookService.editBook(this.idBook, updateBook).subscribe({
+      next: (response) => {
+         console.log(response)
+         Swal.fire({
+           title: 'Exito',
+           text: response.message,
+           icon: 'success',
+           confirmButtonText: 'Aceptar',
+           showConfirmButton: true
+         });
+         this.edit = false;
+         this.getAllBooks();
+      },
+      error: (error) => {
+         console.log(error.error.message)
+         this.edit = false;
+         Swal.fire({
+           title: 'Error!',
+           text: error.error.message,
+           icon: 'error',
+           confirmButtonText: 'Aceptar',
+           showConfirmButton: true
+         })
+      }
+      
+    });
+
+    this.bookForm.reset();
+    
+  }
+ }
+
+ loadBook(id: string){
+  this.bookService.findByIdOrTitle(id).subscribe({
+    next: (response) => {
+       console.log(response);
+       this.bookForm.patchValue(response.data)
+       this.edit = true;
+       this.idBook = id;
+    },
+    error: (error) => {
+       console.log(error.error.message)
+       Swal.fire({
+         title: 'Error!',
+         text: error.error.message,
+         icon: 'error',
+         confirmButtonText: 'Aceptar',
+         showConfirmButton: true
+       })
+    }
+    
+  });
+
+ }
+
+ findByIdOrTitle(){
 
  }
 

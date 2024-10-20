@@ -1,7 +1,7 @@
 <h2>Mis Libros Favoritos</h2>
-<form class="add-book-form" [formGroup]="bookForm" (ngSubmit)="addBook()">
+<form class="add-book-form" [formGroup]="bookForm" (ngSubmit)="addOrEditBook()">
   <input type="text" placeholder="Agregar nuevo libro" formControlName="title">
-  <button type="submit">Agregar</button>
+  <button type="submit">{{ edit ? 'Guardar cambios' : 'Agregar libro' }}</button>
 </form>
 
 <div class="book-list-container">
@@ -14,8 +14,8 @@
     <div class="book-item">
         <span class="book-title">{{ book.title }}</span>
         <div class="buttons">
-            <button class="edit" (click)="editBook(book)">Editar</button>
-            <button class="delete" (click)="deleteBook(book)">Eliminar</button>
+            <button class="edit" (click)="loadBook(book.id)">Editar</button>
+            <button class="delete" (click)="deleteBook(book.id)">Eliminar</button>
         </div>
     </div>
   }@empty {

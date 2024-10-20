@@ -21,4 +21,16 @@ export class BookService {
     return this.http.get<Book>(`${this.base_url}/books`);
   }
 
+  editBook(id: string, book: Book){
+    return this.http.put<Book>(`${this.base_url}/books/${ id }`, book);
+  }
+
+  deleteBook(id: string){
+
+  }
+
+  findByIdOrTitle(id: string){
+    return this.http.get<Book>(`${this.base_url}/books/search/${id}`);
+  }
+
 }
