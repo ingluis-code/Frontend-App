@@ -4,6 +4,7 @@ import { BookService } from './services/book.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Book } from './interfaces/book';
 import Swal from 'sweetalert2';
+import { BehaviorSubject, debounceTime, distinctUntilChanged, filter, Subject, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -21,11 +22,28 @@ export class AppComponent {
   bookForm: FormGroup;
   edit = false;
   idBook: string = "";
+  //searchTerm$ = new BehaviorSubject<string | null>(null);
+  searchTerm$ = new Subject<string>();
 
   constructor() {
     this.bookForm = this.fb.group({
       title: [''],
     });
+
+    this.searchTerm$
+    .pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((term: string) => this.bookService.findByIdOrTitle(term))
+    ).subscribe(filteredItems => {
+       console.log(filteredItems)
+       //this.books = filteredItems.data
+    });
+  }
+
+   onSearch(event: Event): void {
+    const searchTerm = (event.target as HTMLInputElement).value;
+    this.searchTerm$.next(searchTerm); 
   }
 
   ngOnInit(){
@@ -47,7 +65,6 @@ export class AppComponent {
      if(this.bookForm.valid){
        this.bookService.addBook(newBook).subscribe({
          next: (response) => {
-            console.log(response)
             Swal.fire({
               title: 'Exito',
               text: response.message,
@@ -58,7 +75,6 @@ export class AppComponent {
             this.getAllBooks();
          },
          error: (error) => {
-            console.log(error.error.message)
             Swal.fire({
               title: 'Error!',
               text: error.error.message,
@@ -80,7 +96,6 @@ export class AppComponent {
     .subscribe({
      next: (response) => {
        this.books = response.data
-       console.log(this.books)
      },
      error: (error) => {
       Swal.fire({
@@ -103,7 +118,6 @@ export class AppComponent {
 
     this.bookService.editBook(this.idBook, updateBook).subscribe({
       next: (response) => {
-         console.log(response)
          Swal.fire({
            title: 'Exito',
            text: response.message,
@@ -115,7 +129,6 @@ export class AppComponent {
          this.getAllBooks();
       },
       error: (error) => {
-         console.log(error.error.message)
          this.edit = false;
          Swal.fire({
            title: 'Error!',
@@ -136,13 +149,11 @@ export class AppComponent {
  loadBook(id: string){
   this.bookService.findByIdOrTitle(id).subscribe({
     next: (response) => {
-       console.log(response);
        this.bookForm.patchValue(response.data)
        this.edit = true;
        this.idBook = id;
     },
     error: (error) => {
-       console.log(error.error.message)
        Swal.fire({
          title: 'Error!',
          text: error.error.message,
@@ -156,6 +167,31 @@ export class AppComponent {
  }
 
  findByIdOrTitle(){
+
+  this.searchTerm$
+    .pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    )
+    .subscribe(response => {
+     this.books = response
+  });
+
+  this.bookService.findByIdOrTitle('').subscribe({
+    next: (response) => {
+       console.log(response);
+    },
+    error: (error) => {
+       console.log(error.error.message)
+       Swal.fire({
+         title: 'Error!',
+         text: error.error.message,
+         icon: 'error',
+         confirmButtonText: 'Aceptar',
+         showConfirmButton: true
+       })
+    }
+  });
 
  }
 
@@ -174,7 +210,6 @@ export class AppComponent {
     if (result.isConfirmed) {
       this.bookService.deleteBook(id).subscribe({
         next: (response) => {
-           console.log(response);
            Swal.fire({
             title: 'Exito',
             text: response.message,
@@ -185,7 +220,6 @@ export class AppComponent {
           this.getAllBooks();
         },
         error: (error) => {
-           console.log(error.error.message)
            Swal.fire({
              title: 'Error!',
              text: error.error.message,

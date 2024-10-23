@@ -5,10 +5,9 @@
 </form>
 
 <div class="book-list-container">
-  <form class="search-book-form">
-      <input type="text" placeholder="Buscar libro" required>
-      <button type="submit">Buscar</button>
-  </form>
+  <div class="search-book-input">
+    <input placeholder="Buscar libro" (input)="onSearch($event)">
+</div>
 
   @for (book of books; track $index){
     <div class="book-item">
